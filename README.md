@@ -110,6 +110,48 @@ Telegram:
 Email:
 [renothingg@gmail.com](mailto:renothingg@gmail.com)
 
+## Сборка из исходников (Unity + Android)
+
+### Требования
+
+* Unity **той же версии, что используется в проекте**
+* Установленный модуль **Android Build Support** через Unity Hub
+* JDK / SDK / NDK, настроенные внутри Unity
+
+### Шаги
+
+1. Клонируйте репозиторий:
+
+```bash
+git clone https://github.com/ReNothingg/FloppaRun.git
+```
+
+1. Откройте проект в Unity Hub, используя нужную версию Unity.
+
+2. Создайте собственный Android-keystore для подписи APK:
+
+```
+keytool -genkey -v -keystore release.jks -alias release -keyalg RSA -keysize 2048 -validity 10000
+```
+
+1. В **Unity → Project Settings → Player → Publishing Settings**:
+
+* включите **Custom Keystore**
+
+* выберите созданный файл `release.jks`
+* введите свои пароли и alias
+
+1. Соберите APK:
+
+```
+File → Build Settings → Android → Build
+```
+
+### Примечания
+
+* Оригинальный ключ подписи **не включён** в репозиторий по соображениям безопасности.
+* APK, собранный с вашим keystore, будет иметь **другую подпись** и не сможет обновлять официальную версию игры.
+
 ---
 
 **2019 — 2026 © Floppa Run**
