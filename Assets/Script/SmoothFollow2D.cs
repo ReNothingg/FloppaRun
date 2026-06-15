@@ -2,12 +2,12 @@ using UnityEngine;
 
 public class SmoothFollow2D : MonoBehaviour
 {
-    public Transform player;
+    public Transform player; // Player (transform)
     public Vector3 offset;
-    public float smoothSpeed = 0.125f;
+    public float smoothSpeed = 0.1f;
     public float ofssetX;
-    public float ofssetY;
-    public float ofssetZ;
+    public float ofssetY = 1;
+    public float ofssetZ = -10;
 
     void FixedUpdate()
     {

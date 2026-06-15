@@ -11,6 +11,9 @@ public class EnemyController : MonoBehaviour
     public GameObject moneySprite;
     public GameObject moneyEffects;
 
+    public GameObject healthSprite;
+    public GameObject healthEffects;
+
     public float health;
     public Image healthText;
     public MoneySCOB money;
@@ -19,8 +22,9 @@ public class EnemyController : MonoBehaviour
 
     private void Start()
     {
-        chanse = Random.Range(0, 3);
+        chanse = Random.Range(0, 4);
         if (chanse == 1) moneySprite.SetActive(true);
+        if (chanse == 2) healthSprite.SetActive(true);
         InvokeRepeating("Shoot", shhotInterval, shhotInterval);
     }
 
@@ -31,6 +35,7 @@ public class EnemyController : MonoBehaviour
         {
             money.money += 5;
             if (chanse == 1) money.money += 10;
+            if (chanse == 2) GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerControll>().health += 5;
             Destroy(gameObject);
             Instantiate(moneyEffects, transform.position, Quaternion.identity);
         }

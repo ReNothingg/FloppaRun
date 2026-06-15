@@ -44,9 +44,6 @@ public class PlayerControll : MonoBehaviour
     }
 
     void FixedUpdate() {
-        if (facingRight == false && MoveInputX > 0) Flip();
-        else if (facingRight == true && MoveInputX < 0) Flip();
-
         MoveInputY = joystick.Vertical;
         MoveInputX = joystick.Horizontal;
 
@@ -67,13 +64,5 @@ public class PlayerControll : MonoBehaviour
         health -= damage;
         Instantiate(damageEf, transform.position, Quaternion.identity);
         audioSource.PlayOneShot(damageClip);
-    }
-
-    void Flip()
-    {
-        facingRight = !facingRight;
-        Vector3 Scaler = transform.localScale;
-        Scaler.x *= -1;
-        transform.localScale = Scaler;
     }
 }

@@ -7,7 +7,6 @@ public class PostProcessingInitializer : MonoBehaviour
 
     private void Start()
     {
-        // Загрузка состояния Toggle при запуске сцены
         bool isPostProcessingEnabled = PlayerPrefs.GetInt("PostProcessingEnabled", 1) == 1;
         postProcessVolume.enabled = isPostProcessingEnabled;
     }

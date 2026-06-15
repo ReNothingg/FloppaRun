@@ -123,6 +123,17 @@
       "dependencyXmlFileName": "ISUnityAdsAdapterDependencies.xml",
       "SKAdNetworkIdXmlURL": "https://s3.amazonaws.com/ssa.public/Unity/SKAdNetwork-IDs/All/skadnetworks.unityads.plist.xml",
       "versions": {
+        "4.3.70.0": {
+          "ironSourceSdkVersion": "[8.9.0, 9.0[",
+          "android": {
+            "adapterVersion": "4.3.65",
+            "adNetworkVersion": "4.17.0"
+          },
+          "ios": {
+            "adapterVersion": "4.3.61.0",
+            "adNetworkVersion": "4.17.0"
+          }
+        },
         "4.3.69.0": {
           "ironSourceSdkVersion": "[8.9.0, 9.0[",
           "android": {
@@ -4565,6 +4576,25 @@
           "ios": {
             "adapterVersion": "4.3.5.1",
             "adNetworkVersion": "7.5.1"
+          }
+        }
+      }
+    },
+    "Voodoo": {
+      "displayName": "Voodoo",
+      "dependencyXmlURL": "https://s3.amazonaws.com/ssa.public/Dependencies-xmls/Voodoo/${VERSION}/ISVoodooAdapterDependencies.xml",
+      "dependencyXmlFileName": "ISVoodooAdapterDependencies.xml",
+      "SKAdNetworkIdXmlURL": "https://s3.amazonaws.com/ssa.public/Unity/SKAdNetwork-IDs/All/skadnetworks.voodoo.plist.xml",
+      "versions": {
+        "4.1.1.0": {
+          "ironSourceSdkVersion": "[8.9.0, 9.0[",
+          "android": {
+            "adapterVersion": "4.1.1",
+            "adNetworkVersion": "4.26.1"
+          },
+          "ios": {
+            "adapterVersion": "4.1.1.0",
+            "adNetworkVersion": "3.15.1"
           }
         }
       }

@@ -38,14 +38,13 @@ public class Settings : MonoBehaviour
     {
         postProcessVolume.enabled = isEnabled;
 
-        // Сохранение состояния Toggle
         PlayerPrefs.SetInt("PostProcessingEnabled", isEnabled ? 1 : 0);
         PlayerPrefs.Save();
     }
 
     public void OpenMyWeb()
     {
-        Application.OpenURL("https://renothingg.github.io/ReNothingg/");
+        Application.OpenURL("https://renothingg.github.io/");
     }
 
     public void ExitGame() => Application.Quit();

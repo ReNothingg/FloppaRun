@@ -71,14 +71,6 @@ public class LevelGenerator : MonoBehaviour
         Generate();
     }
 
-    void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.R))
-        {
-            Generate();
-        }
-    }
-
     void CreateLevelParent()
     {
         if (_generatedLevelParent == null)

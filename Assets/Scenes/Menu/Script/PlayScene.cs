@@ -10,5 +10,8 @@ public class PlayScene : MonoBehaviour
         button.onClick.AddListener(Click);
         Time.timeScale = 1.0f;
     }
-    void Click() { SceneManager.LoadScene(scene); }
+    void Click() { 
+        SceneManager.LoadScene(scene); 
+        Time.timeScale = 1; 
+    }
 }
