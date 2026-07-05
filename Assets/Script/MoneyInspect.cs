@@ -10,8 +10,7 @@ public class MoneyInspect : MonoBehaviour
 
     public bool isDwetochki = true;
 
-    void Update()
-    {
+    private void Update() {
         string separator = isDwetochki ? ": " : string.Empty;
         text.text = stertText + separator + money.money.ToString();
     }

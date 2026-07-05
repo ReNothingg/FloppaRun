@@ -5,20 +5,19 @@ public class BoostRun : MonoBehaviour
     public float boostAmount = 2.0f;
     public float boostDuration = 5.0f;
 
-    private void OnTriggerEnter2D(Collider2D collision)
-    {
-        if (collision.CompareTag("Player"))
-        {
+    private void OnTriggerEnter2D(Collider2D collision) {
+        if (collision.CompareTag("Player")) {
             PlayerController player = collision.GetComponent<PlayerController>();
-            if (player != null)
-            {
+            if (player != null) {
                 StartCoroutine(Boost(player));
+                
+                GameObject bottle = transform.GetChild(0).gameObject;
+                bottle.SetActive(false);        
             }
         }
     }
 
-    private IEnumerator Boost(PlayerController player)
-    {
+    private IEnumerator Boost(PlayerController player) {
         float originalSpeed = player.speed;
         player.speed += boostAmount;
 

@@ -13,8 +13,8 @@ public class PlayerController : MonoBehaviour
 
     public MoneySCOB money;
 
-    public float speed;
-    public float JumpForce;
+    public float speed = 6;
+    public float JumpForce = 8;
     private float MoveInput;
     public bool canMove = true;
     private bool facingRight = true;
@@ -22,7 +22,7 @@ public class PlayerController : MonoBehaviour
     public Joystick joystick;
     private bool isGrounded;
     public Transform feetPos;
-    public Vector2 groundedRadius;
+    public Vector2 groundedRadius = new Vector2(1.29f, 0.1f);
     public LayerMask layerGround;
     private float angle = 0;
     private AudioSource audioSource;
@@ -32,17 +32,14 @@ public class PlayerController : MonoBehaviour
     public bool bronikBool;
     public GameObject getDamageInBronikEffect;
 
-    private void Start() 
-    {
+    private void Start() {
         rb = GetComponent<Rigidbody2D>();
         audioSource = GetComponent<AudioSource>();
     }
 
-    private void Update()
-    {
+    private void Update() {
         healthText.fillAmount = health / 100f;
-        if (health <= 0)
-        {
+        if (health <= 0) {
             money.money -= 10;
             PlayerPrefs.SetInt("Money", money.money);
             SceneManager.LoadScene("Menu");
@@ -55,11 +52,9 @@ public class PlayerController : MonoBehaviour
         if (Input.GetKey(KeyCode.A)) rb.linearVelocity = new Vector2(-1 * speed, rb.linearVelocity.y);
     }
 
-    private void FixedUpdate() 
-    {
+    private void FixedUpdate() {
         if (canMove == true) MoveInput = joystick.Horizontal;
-        if (canMove == true)
-        {
+        if (canMove == true) {
             rb.linearVelocity = new Vector2(MoveInput * speed, rb.linearVelocity.y);
             isGrounded = Physics2D.OverlapBox(feetPos.position, groundedRadius, angle, layerGround);
             if (facingRight == false && MoveInput > 0) Flip();
@@ -69,17 +64,14 @@ public class PlayerController : MonoBehaviour
         bronik.SetActive(bronikBool);
     }
 
-    public void OnJumpButtonDown() 
-    {
-        if (isGrounded == true)
-        {
+    public void OnJumpButtonDown() {
+        if (isGrounded == true) {
             audioSource.PlayOneShot(jumpClip);
             rb.linearVelocity = Vector2.up * JumpForce;
         } 
     }
 
-    void Flip() 
-    {
+    private void Flip() {
         facingRight = !facingRight;
         Vector3 Scaler = transform.localScale;
         Scaler.x *= -1;
@@ -88,16 +80,13 @@ public class PlayerController : MonoBehaviour
 
     private void OnDrawGizmos() => Gizmos.DrawWireCube(feetPos.position, groundedRadius);
 
-    public void takeGamage(int damage) 
-    {
-        if(bronikBool == false) 
-        {
+    public void takeGamage(int damage) {
+        if(bronikBool == false) {
             health -= damage;
             audioSource.PlayOneShot(damageClip);
             Instantiate(getDamageEffect, transform.position, Quaternion.identity);
         }
-        else
-        {
+        else {
             if (damage >= 100) health = 0;
             Instantiate(getDamageInBronikEffect, transform.position, Quaternion.identity);
         }

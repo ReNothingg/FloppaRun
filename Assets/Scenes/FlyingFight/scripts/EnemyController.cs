@@ -1,12 +1,11 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-public class EnemyController : MonoBehaviour
-{
-    public float speed;
+public class EnemyController : MonoBehaviour {
+    public float speed = 0.1f;
     public GameObject EnemyBullet;
-    public float shhotInterval;
-    public float lifeTime;
+    public float shhotInterval = 2;
+    public float lifeTime = 10;
 
     public GameObject moneySprite;
     public GameObject moneyEffects;
@@ -14,25 +13,22 @@ public class EnemyController : MonoBehaviour
     public GameObject healthSprite;
     public GameObject healthEffects;
 
-    public float health;
+    public float health = 100;
     public Image healthText;
     public MoneySCOB money;
 
     private int chanse = 0;
 
-    private void Start()
-    {
+    private void Start() {
         chanse = Random.Range(0, 4);
         if (chanse == 1) moneySprite.SetActive(true);
         if (chanse == 2) healthSprite.SetActive(true);
         InvokeRepeating("Shoot", shhotInterval, shhotInterval);
     }
 
-    private void Update()
-    {
+    private void Update() {
         healthText.fillAmount = health / 100f;
-        if (health <= 0)
-        {
+        if (health <= 0) {
             money.money += 5;
             if (chanse == 1) money.money += 10;
             if (chanse == 2) GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerControll>().health += 5;
@@ -46,14 +42,12 @@ public class EnemyController : MonoBehaviour
         Destroy(gameObject, lifeTime);
     }
 
-    void Shoot() => Instantiate(EnemyBullet, transform.position, Quaternion.identity);
+    private void Shoot() => Instantiate(EnemyBullet, transform.position, Quaternion.identity);
 
     public void GetDamage(float GetDamage) => health -= GetDamage;
 
-    private void OnTriggerEnter2D(Collider2D collision)
-    {
-        if (collision.gameObject.tag == "PlayerBullet")
-        {
+    private void OnTriggerEnter2D(Collider2D collision) {
+        if (collision.gameObject.tag == "PlayerBullet") {
             health -= collision.gameObject.GetComponent<PlayerBulled>().damage;
             Destroy(collision.gameObject);
         }

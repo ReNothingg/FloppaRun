@@ -9,8 +9,7 @@ public class EndLevel : MonoBehaviour
     public int bonus;
 
     private void OnTriggerEnter2D(Collider2D collision) {
-        if (collision.tag == "Player")
-        {
+        if (collision.tag == "Player") {
             money.money += bonus;
             collision.gameObject.GetComponent<PlayerController>().canMove = false;
             endPanel.SetActive(true);

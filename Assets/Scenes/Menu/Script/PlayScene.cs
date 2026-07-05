@@ -6,11 +6,12 @@ public class PlayScene : MonoBehaviour
 {
     public Button button;
     public string scene;
-    void Start() { 
+    private void Start() {
         button.onClick.AddListener(Click);
         Time.timeScale = 1.0f;
     }
-    void Click() { 
+    
+    private void Click() { 
         SceneManager.LoadScene(scene); 
         Time.timeScale = 1; 
     }

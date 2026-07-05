@@ -8,16 +8,14 @@ public class RandomRotation : MonoBehaviour
 
     public Sprite[] sprite;
 
-    private void Start()
-    {
+    private void Start() {
         speed = Random.Range(1f, 5f);
         degres = Random.Range(-1, 1);
 
         GetComponent<SpriteRenderer>().sprite = sprite[Random.Range(0,1)];
     }
 
-    void FixedUpdate()
-    {
+    private void FixedUpdate() {
         transform.Rotate(0, 0, (degres * speed));
 
         if (degres == 0) degres = Random.Range(-1, 1);

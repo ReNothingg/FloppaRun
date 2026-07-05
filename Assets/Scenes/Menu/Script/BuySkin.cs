@@ -9,32 +9,24 @@ public class BuySkin : MonoBehaviour
 
     private Button block;
 
-    void Awake()
-    {
-        isBuyedAwake();
-    }
+    private void Awake() => isBuyedAwake();
 
-    void isBuyedAwake()
-    {
+    private void isBuyedAwake() {
         isBuyed = PlayerPrefs.GetInt(objectName + "Acces");
         block = GetComponent<Button>();
         priceTxt.text = price.ToString();
 
-        if (isBuyed == 1)
-        {
+        if (isBuyed == 1) {
             block.interactable = true;
             priceTxt.text = "Buyed";
         }
     }
 
-    public void OnButtonDown()
-    {
+    public void OnButtonDown() {
         int coins = PlayerPrefs.GetInt("Money");
 
-        if (isBuyed == 0)
-        {
-            if (coins >= price)
-            {
+        if (isBuyed == 0) {
+            if (coins >= price) {
                 PlayerPrefs.SetInt(objectName + "Acces", 1);
                 PlayerPrefs.SetInt("Money", coins - price);
                 isBuyedAwake();

@@ -7,6 +7,6 @@ public class ShowPanelInButton : MonoBehaviour
     public GameObject Object;
     public bool SetActivet = false;
 
-    void Start() => button.onClick.AddListener(Click);
-    void Click() => Object.SetActive(SetActivet);
+    private void Start() => button.onClick.AddListener(Click);
+    private void Click() => Object.SetActive(SetActivet);
 }

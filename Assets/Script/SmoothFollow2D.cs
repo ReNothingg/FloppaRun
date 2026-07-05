@@ -9,8 +9,7 @@ public class SmoothFollow2D : MonoBehaviour
     public float ofssetY = 1;
     public float ofssetZ = -10;
 
-    void FixedUpdate()
-    {
+    private void FixedUpdate() {
         Vector3 desiredPosition =  new Vector3(player.position.x + ofssetX, player.position.y + ofssetY, -10) + offset;
         Vector3 smoothedPosition = Vector3.Lerp(transform.position, desiredPosition, smoothSpeed);
         transform.position = new Vector3(smoothedPosition.x, smoothedPosition.y, ofssetZ);

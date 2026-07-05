@@ -3,11 +3,9 @@ using UnityEngine;
 public class BackroundInf : MonoBehaviour
 {
     public float speed;
-    public float endX;
-    public float startX;
+    public float startX, endX;
      
-    void Update()
-    {
+    private void Update() {
         transform.Translate(Vector2.left * speed * Time.deltaTime);
 
         if(transform.position.x <= endX) { 

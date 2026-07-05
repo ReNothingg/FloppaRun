@@ -1,8 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-public class LevelGenerator : MonoBehaviour
-{
+public class LevelGenerator : MonoBehaviour {
     [Space(10), Header("Prefabs")]
     public GameObject grassPrefab;
     public GameObject grassLeftEdgePrefab;
@@ -65,13 +64,12 @@ public class LevelGenerator : MonoBehaviour
     private Dictionary<Vector2Int, GameObject> _terrainBlocks = new Dictionary<Vector2Int, GameObject>();
 
 
-    void Start()
-    {
+    private void Start() {
         CreateLevelParent();
         Generate();
     }
 
-    void CreateLevelParent()
+    private void CreateLevelParent()
     {
         if (_generatedLevelParent == null)
         {
@@ -84,7 +82,7 @@ public class LevelGenerator : MonoBehaviour
         }
     }
 
-    void ClearLevel()
+    public void ClearLevel()
     {
         if (_generatedLevelParent == null) CreateLevelParent();
 
@@ -96,11 +94,10 @@ public class LevelGenerator : MonoBehaviour
         _terrainBlocks.Clear();
     }
 
-    public void Generate()
-    {
+    public void Generate() {
         ClearLevel();
         GenerateLevel();
-        GenerateClouds();
+        // GenerateClouds();
         GenerateUnderJava();
     }
 
@@ -122,42 +119,104 @@ public class LevelGenerator : MonoBehaviour
         return null;
     }
 
+    GameObject CreateTiledObject(GameObject prefab, Vector2 centerPosition, Vector2 size)
+    {
+        if (prefab == null || size.x <= 0f || size.y <= 0f) return null;
 
-    void GenerateLevel()
+        GameObject instance = Instantiate(prefab, centerPosition, Quaternion.identity, _generatedLevelParent);
+
+        SpriteRenderer spriteRenderer = instance.GetComponent<SpriteRenderer>();
+        if (spriteRenderer != null) {
+            spriteRenderer.drawMode = SpriteDrawMode.Tiled;
+            spriteRenderer.size = size;
+        }
+        else {
+            instance.transform.localScale = new Vector3(size.x, size.y, instance.transform.localScale.z);
+        }
+
+        BoxCollider2D boxCollider = instance.GetComponent<BoxCollider2D>();
+        if (boxCollider != null) {
+            boxCollider.size = size;
+            boxCollider.offset = Vector2.zero;
+        }
+
+        return instance;
+    }
+
+    private void CreateGroundSegment(int startX, int endXExclusive, int height)
+    {
+        int width = endXExclusive - startX;
+        if (width <= 0 || height <= 0) return;
+
+        float centerX = startX + width * 0.5f - 0.5f;
+
+        CreateTiledObject(
+            grassPrefab,
+            new Vector2(centerX, height - 1f),
+            new Vector2(width, 1f)
+        );
+
+        int dirtHeight = height - 1;
+        if (dirtHeight > 0) {
+            CreateTiledObject(
+                dirtPrefab,
+                new Vector2(centerX, dirtHeight * 0.5f - 0.5f),
+                new Vector2(width, dirtHeight)
+            );
+        }
+    }
+
+    private void CreateDirtColumn(int x, int height)
+    {
+        int dirtHeight = height - 1;
+        if (dirtHeight <= 0) return;
+
+        CreateTiledObject(
+            dirtPrefab,
+            new Vector2(x, dirtHeight * 0.5f - 0.5f),
+            new Vector2(1f, dirtHeight)
+        );
+    }
+
+    private void FlushGroundSegment(ref int segmentStartX, int currentX, int segmentHeight)
+    {
+        if (segmentStartX >= 0) {
+            CreateGroundSegment(segmentStartX, currentX, segmentHeight);
+            segmentStartX = -1;
+        }
+    }
+
+    private void GenerateLevel()
     {
         Dictionary<NewItem, int> lastItemPositions = new Dictionary<NewItem, int>();
-        foreach (var item in newItems)
-        {
+        foreach (var item in newItems) {
             lastItemPositions[item] = -item.minDistance;
         }
 
         int currentHeight = 0;
         int lastHeight = 0;
         int lastHolePosition = -minDistanceBetweenHoles;
+        int groundSegmentStartX = -1;
+        int groundSegmentHeight = 0;
 
         bool riverPlaced = false;
         int lakeLength = Random.Range(minLakeLength, maxLakeLength + 1);
         int lakeStartPosition = Mathf.FloorToInt(levelLength * lakeAttemptPositionFactor);
 
-        for (int i = 0; i < levelLength; i++)
-        {
-            Vector2Int currentPos = new Vector2Int(i, 0);
+        for (int i = 0; i < levelLength; i++) {
+            if (!riverPlaced && i >= lakeStartPosition && i + lakeLength < levelLength) {
+                FlushGroundSegment(ref groundSegmentStartX, i, groundSegmentHeight);
 
-
-            if (!riverPlaced && i >= lakeStartPosition && i + lakeLength < levelLength)
-            {
                 if (lakeWarningPrefab != null)
                     Instantiate(lakeWarningPrefab, new Vector2(i - 1, (groundThickness + currentHeight) - 0.2f), Quaternion.Euler(0, 0, -15), _generatedLevelParent);
 
-                for (int lakeIdx = 0; lakeIdx < lakeLength; lakeIdx++)
-                {
+                for (int lakeIdx = 0; lakeIdx < lakeLength; lakeIdx++) {
                     int riverX = i + lakeIdx;
                     Vector2Int lakeBlockPos = new Vector2Int(riverX, 0);
                     if (UpperLakePrefab != null)
                         Instantiate(UpperLakePrefab, new Vector2(riverX, (groundThickness) - 0.12f), Quaternion.identity, _generatedLevelParent);
 
-                    for (int j = groundThickness - 1; j >= 0; j--)
-                    {
+                    for (int j = groundThickness - 1; j >= 0; j--) {
                         PlaceOrReplaceBlock(new Vector2Int(riverX, j), DownBlockLakePrefab, Quaternion.identity);
                     }
                 }
@@ -168,8 +227,9 @@ public class LevelGenerator : MonoBehaviour
                 continue;
             }
 
-            if (i - lastHolePosition >= minDistanceBetweenHoles && Random.value < holeSpawnChance && i + minHoleWidth < levelLength - maxHoleWidth)
-            {
+            if (i - lastHolePosition >= minDistanceBetweenHoles && Random.value < holeSpawnChance && i + minHoleWidth < levelLength - maxHoleWidth) {
+                FlushGroundSegment(ref groundSegmentStartX, i, groundSegmentHeight);
+
                 int holeWidth = Random.Range(minHoleWidth, maxHoleWidth + 1);
 
                 if (holeWarningPrefab != null && holeWidth > 9)
@@ -186,61 +246,67 @@ public class LevelGenerator : MonoBehaviour
                 continue;
             }
 
-            if (i > 0 && (minDistanceForHeightChangeAttempt <= 1 || i % minDistanceForHeightChangeAttempt == 0))
-            {
+            if (i > 0 && (minDistanceForHeightChangeAttempt <= 1 || i % minDistanceForHeightChangeAttempt == 0)) {
                 int heightChange = Random.Range(-maxHeightVariation, maxHeightVariation + 1);
                 currentHeight = Mathf.Clamp(currentHeight + heightChange, 0, this.maxHeightVariation);
             }
 
-            for (int y = 0; y < groundThickness + currentHeight; y++)
-            {
-                GameObject prefabToPlace = (y == groundThickness + currentHeight - 1) ? grassPrefab : dirtPrefab;
-                PlaceOrReplaceBlock(new Vector2Int(i, y), prefabToPlace, Quaternion.identity);
+            int totalGroundHeight = groundThickness + currentHeight;
+
+            if (i > 0 && currentHeight > lastHeight) {
+                FlushGroundSegment(ref groundSegmentStartX, i, groundSegmentHeight);
+                CreateDirtColumn(i, totalGroundHeight);
+
+                Vector2Int capPos = new Vector2Int(i, groundThickness + currentHeight - 1);
+                GameObject capPrefab = grassLeftEdgePrefab != null ? grassLeftEdgePrefab : grassPrefab;
+                PlaceOrReplaceBlock(capPos, capPrefab, Quaternion.identity);
+
+                int wallStartY = groundThickness + currentHeight - 2;
+                int wallEndY = groundThickness + lastHeight;
+                for (int yWall = wallStartY; yWall >= wallEndY; yWall--) {
+                    Vector2Int wallPos = new Vector2Int(i, yWall);
+                    GameObject wallSegmentPrefab = grassPrefab;
+                    PlaceOrReplaceBlock(wallPos, wallSegmentPrefab, Quaternion.Euler(0, 0, 90));
+                }
+
+                groundSegmentStartX = i + 1;
+                groundSegmentHeight = totalGroundHeight;
+            }
+            else if (i > 0 && currentHeight < lastHeight) {
+                FlushGroundSegment(ref groundSegmentStartX, i - 1, groundSegmentHeight);
+                CreateDirtColumn(i - 1, groundThickness + lastHeight);
+
+                Vector2Int capPos = new Vector2Int(i - 1, groundThickness + lastHeight - 1);
+                GameObject capPrefab = grassRightEdgePrefab != null ? grassRightEdgePrefab : grassPrefab;
+                PlaceOrReplaceBlock(capPos, capPrefab, Quaternion.identity);
+
+                int wallStartY = groundThickness + lastHeight - 2;
+                int wallEndY = groundThickness + currentHeight;
+                for (int yWall = wallStartY; yWall >= wallEndY; yWall--) {
+                    Vector2Int wallPos = new Vector2Int(i - 1, yWall);
+                    GameObject wallSegmentPrefab = grassPrefab;
+                    PlaceOrReplaceBlock(wallPos, wallSegmentPrefab, Quaternion.Euler(0, 0, -90));
+                }
+
+                groundSegmentStartX = i;
+                groundSegmentHeight = totalGroundHeight;
+            }
+            else if (groundSegmentStartX < 0) {
+                groundSegmentStartX = i;
+                groundSegmentHeight = totalGroundHeight;
+            }
+            else if (groundSegmentHeight != totalGroundHeight) {
+                FlushGroundSegment(ref groundSegmentStartX, i, groundSegmentHeight);
+                groundSegmentStartX = i;
+                groundSegmentHeight = totalGroundHeight;
             }
 
-            if (i > 0)
-            {
-                if (currentHeight > lastHeight)
-                {
-                    Vector2Int capPos = new Vector2Int(i, groundThickness + currentHeight - 1);
-                    GameObject capPrefab = grassLeftEdgePrefab != null ? grassLeftEdgePrefab : grassPrefab;
-                    PlaceOrReplaceBlock(capPos, capPrefab, Quaternion.identity);
-
-                    int wallStartY = groundThickness + currentHeight - 2;
-                    int wallEndY = groundThickness + lastHeight;
-                    for (int yWall = wallStartY; yWall >= wallEndY; yWall--)
-                    {
-                        Vector2Int wallPos = new Vector2Int(i, yWall);
-                        GameObject wallSegmentPrefab = grassPrefab;
-                        PlaceOrReplaceBlock(wallPos, wallSegmentPrefab, Quaternion.Euler(0, 0, 90));
-                    }
-                }
-                else if (currentHeight < lastHeight)
-                {
-                    Vector2Int capPos = new Vector2Int(i - 1, groundThickness + lastHeight - 1);
-                    GameObject capPrefab = grassRightEdgePrefab != null ? grassRightEdgePrefab : grassPrefab;
-                    PlaceOrReplaceBlock(capPos, capPrefab, Quaternion.identity);
-
-                    int wallStartY = groundThickness + lastHeight - 2;
-                    int wallEndY = groundThickness + currentHeight;
-                    for (int yWall = wallStartY; yWall >= wallEndY; yWall--)
-                    {
-                        Vector2Int wallPos = new Vector2Int(i - 1, yWall);
-                        GameObject wallSegmentPrefab = grassPrefab;
-                        PlaceOrReplaceBlock(wallPos, wallSegmentPrefab, Quaternion.Euler(0, 0, -90));
-                    }
-                }
-            }
             lastHeight = currentHeight;
 
-
-            foreach (var item in newItems)
-            {
-                if (item.prefab != null && i - lastItemPositions[item] >= item.minDistance && Random.value < item.spawnChance)
-                {
+            foreach (var item in newItems) {
+                if (item.prefab != null && i - lastItemPositions[item] >= item.minDistance && Random.value < item.spawnChance) {
                     Vector2 spawnPosition = new Vector2(i, (groundThickness + currentHeight) + item.yOffset);
-                    if (!occupiedPositions.Contains(spawnPosition))
-                    {
+                    if (!occupiedPositions.Contains(spawnPosition)) {
                         Instantiate(item.prefab, spawnPosition, Quaternion.identity, _generatedLevelParent);
                         lastItemPositions[item] = i;
                         occupiedPositions.Add(spawnPosition);
@@ -249,44 +315,55 @@ public class LevelGenerator : MonoBehaviour
             }
         }
 
-        if (flag != null)
-        {
+        FlushGroundSegment(ref groundSegmentStartX, levelLength, groundSegmentHeight);
+
+        if (flag != null) {
             flag.transform.position = new Vector2(levelLength + 5, groundThickness + lastHeight);
             if (_generatedLevelParent != null) flag.transform.SetParent(_generatedLevelParent);
         }
     }
 
-    void GenerateClouds()
-    {
-        if (cloudPrefabs == null || cloudPrefabs.Length == 0 || cloudHorizontalSpacing <= 0) return;
-        float currentX = 0f;
-        while (currentX < levelLength)
-        {
-            if (Random.value < cloudSpawnChance)
-            {
-                GameObject cloudPrefab = cloudPrefabs[Random.Range(0, cloudPrefabs.Length)];
-                if (cloudPrefab != null)
-                {
-                    float cloudY = Random.Range(this.maxHeightVariation + groundThickness + cloudMinY, this.maxHeightVariation + groundThickness + cloudMaxY);
-                    Instantiate(cloudPrefab, new Vector3(currentX, cloudY, 0), Quaternion.identity, _generatedLevelParent);
-                }
-            }
-            currentX += cloudHorizontalSpacing;
-        }
-    }
+    // Фишка бесполезная, т.к она ела довольно много ресурсов и дополнительно облка создавались только относительно оси уровня, а не точки максимума уровня (условной возвышенности). Так же оно несло сугубо декоративный характер и выпиисывается из основной темы игры.
+    // void GenerateClouds()
+    // {
+    //     if (cloudPrefabs == null || cloudPrefabs.Length == 0 || cloudHorizontalSpacing <= 0) return;
+    //     float currentX = 0f;
+    //     while (currentX < levelLength) {
+    //         if (Random.value < cloudSpawnChance) {
+    //             GameObject cloudPrefab = cloudPrefabs[Random.Range(0, cloudPrefabs.Length)];
+    //             if (cloudPrefab != null) {
+    //                 float cloudY = Random.Range(this.maxHeightVariation + groundThickness + cloudMinY, this.maxHeightVariation + groundThickness + cloudMaxY);
+    //                 Instantiate(cloudPrefab, new Vector3(currentX, cloudY, 0), Quaternion.identity, _generatedLevelParent);
+    //             }
+    //         }
+    //         currentX += cloudHorizontalSpacing;
+    //     }
+    // }
 
-    void GenerateUnderJava()
+    private void GenerateUnderJava()
     {
-        if (mainJavaPrefab == null || blockJavaPrefab == null || javaBlockWidth <= 0) return;
-        float currentX = 0f;
-        while (currentX < levelLength)
+        if (levelLength <= 0) return;
+
+        float javaWidth = levelLength;
+        float centerX = javaWidth * 0.5f - 0.5f;
+
+        if (mainJavaPrefab != null) {
+            CreateTiledObject(
+                mainJavaPrefab,
+                new Vector2(centerX, javaY - 0.12f),
+                new Vector2(javaWidth, 1f)
+            );
+        }
+
+        if (blockJavaPrefab != null && javaLayerCount > 0)
         {
-            Instantiate(mainJavaPrefab, new Vector3(currentX, javaY - 0.12f, 0), Quaternion.identity, _generatedLevelParent);
-            for (int j = 0; j < javaLayerCount; j++)
-            {
-                Instantiate(blockJavaPrefab, new Vector3(currentX, javaY - (1 + j), 0), Quaternion.identity, _generatedLevelParent);
-            }
-            currentX += javaBlockWidth;
+            float blockCenterY = javaY - (javaLayerCount + 1) * 0.5f;
+
+            CreateTiledObject(
+                blockJavaPrefab,
+                new Vector2(centerX, blockCenterY),
+                new Vector2(javaWidth, javaLayerCount)
+            );
         }
     }
 }

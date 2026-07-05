@@ -10,8 +10,7 @@ public class Settings : MonoBehaviour
     public Slider volumeSlider;
     public AudioMixer mixer;
 
-    private void Start()
-    {
+    private void Start() {
         volumeSlider.value = PlayerPrefs.GetFloat("musicVolume");
         SetMusicVolume();
         SetTargetFPS(120);
@@ -21,31 +20,25 @@ public class Settings : MonoBehaviour
         TogglePostProcessing(postProcessingToggle.isOn);
     }
 
-    public void SetMusicVolume()
-    {
+    public void SetMusicVolume() {
         float volume = volumeSlider.value;
         mixer.SetFloat("music", +Mathf.Log10(volume)*20);
         PlayerPrefs.SetFloat("musicVolume", volume);
     }
 
-    public void SetTargetFPS(int targetFps)
-    {
+    public void SetTargetFPS(int targetFps) {
         QualitySettings.vSyncCount = 0;
         Application.targetFrameRate = targetFps;
     }
 
-    private void TogglePostProcessing(bool isEnabled)
-    {
+    private void TogglePostProcessing(bool isEnabled) {
         postProcessVolume.enabled = isEnabled;
 
         PlayerPrefs.SetInt("PostProcessingEnabled", isEnabled ? 1 : 0);
         PlayerPrefs.Save();
     }
 
-    public void OpenMyWeb()
-    {
-        Application.OpenURL("https://renothingg.github.io/");
-    }
+    public void OpenMyWeb() => Application.OpenURL("https://renothingg.github.io/");
 
     public void ExitGame() => Application.Quit();
 }

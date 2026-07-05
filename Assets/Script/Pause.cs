@@ -9,8 +9,7 @@ public class Pause : MonoBehaviour
 
     private bool isPaused = false;
 
-    void Start()
-    {
+    private void Start() {
         Time.timeScale = 1f;
         isPaused = false;
         panelPause.SetActive(false);
@@ -18,8 +17,7 @@ public class Pause : MonoBehaviour
         close.onClick.AddListener(TogglePause);
     }
 
-    public void TogglePause()
-    {
+    public void TogglePause() {
         isPaused = !isPaused;
 
         Time.timeScale = isPaused ? 0f : 1f;
